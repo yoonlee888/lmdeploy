@@ -338,6 +338,7 @@ async def chat_completions_v1(request: ChatCompletionRequest, raw_request: Reque
         adapter_name = model_name  # got a adapter name
     request_id = str(request.session_id)
     created_time = int(time.time())
+    logger.warning(f'get request id {request_id}, time {created_time}')
 
     if isinstance(request.stop, str):
         request.stop = [request.stop]
@@ -551,7 +552,8 @@ async def chat_completions_v1(request: ChatCompletionRequest, raw_request: Reque
         choices=choices,
         usage=usage,
     )
-
+    finish_time = int(time.time())
+    logger.warning(f'finish request id {request_id}, time {finish_time}')
     return response
 
 

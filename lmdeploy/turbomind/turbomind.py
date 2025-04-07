@@ -534,7 +534,7 @@ class TurboMindInstance:
             stream_output (bool): indicator for stream output
             kwargs (dict): kwargs for backward compatibility
         """
-        logger.info(f'[async_stream_infer] session {session_id} start')
+        logger.warning(f'[async_stream_infer] session {session_id} start')
         gen_cfg = self._get_generation_config(gen_config)
 
         inputs, input_len = self.prepare_inputs(input_ids=input_ids,
@@ -607,7 +607,7 @@ class TurboMindInstance:
             while not state or state.status == 0:
                 await sem.acquire()
                 state = shared_state.consume()
-            logger.info(f'[async_stream_infer] session {session_id} done')
+            logger.warning(f'[async_stream_infer] session {session_id} done')
 
     def _get_error_output(self):
         return EngineOutput(status=ResponseType.INTERNAL_ENGINE_ERROR, token_ids=[], num_token=0)

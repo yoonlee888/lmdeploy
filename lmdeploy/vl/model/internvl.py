@@ -1,6 +1,6 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 from typing import Dict, List
-
+import time
 import torch
 from transformers import AutoConfig, AutoModel, CLIPImageProcessor
 
@@ -162,7 +162,7 @@ class InternVLVisionModel(VisonModel):
             split = [x.shape[0] for x in pixel_values]
             pixel_values = torch.cat(pixel_values, dim=0)
             pixel_values = pixel_values.to(self.model.device, dtype=torch.float16)
-            logger.info(f'vision forward shape: {pixel_values.shape}')
+            logger.warning(f'vision forward shape: {pixel_values.shape}')
             feats = self.model.extract_feature(pixel_values)
             feats = torch.split(feats, split, dim=0)
             outputs.extend([x.reshape(-1, x.shape[-1]) for x in feats])
@@ -181,7 +181,7 @@ class InternVLVisionModel(VisonModel):
             pixel_values = [x['pixel_values'] for x in inputs[idx:idx + max_batch_size]]
             pixel_values = torch.cat(pixel_values, dim=0)
             pixel_values = pixel_values.to(self.model.device, dtype=torch.float16)
-            logger.info(f'vision forward shape: {pixel_values.shape}')
+            logger.warning(f'vision forward shape: {pixel_values.shape}')
             feats = self.model.extract_feature(pixel_values)
             feats = torch.split(feats, 1, dim=0)
             outputs.extend([x.squeeze() for x in feats])
@@ -215,10 +215,14 @@ class InternVLVisionModel(VisonModel):
         Return:
             the message list with forwarding results included
         """
+        st_tm = time.time()
+        logger.warning(f'start forward func, time {st_tm}')
         inputs = [x['content'] for x in messages if x['role'] == 'preprocess']
         inputs = inputs[0]
         outputs = self._forward_func(inputs, max_batch_size)
         messages.append(dict(role='forward', content=outputs))
+        ed_tm = time.time()
+        logger.warning(f'end forward func, time {ed_tm}')
         return messages
 
     @staticmethod
